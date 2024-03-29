@@ -1,0 +1,6 @@
+POST http://localhost:4000/generate-etcd-key
+Accept: application/json
+Content-Type: application/json
+
+
+###

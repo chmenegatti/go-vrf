@@ -1,114 +1,58 @@
-package client
+package nsxt
 
 import (
-	"context"
+	"crypto/tls"
 	"fmt"
-	"strings"
+	"log"
+	"net/http"
+	"time"
 
-	"go-vrf/src/nsxt"
+	"go-vrf/src/configs"
 )
 
-const (
-	XSRF_TOKEN = "X-XSRF-TOKEN"
-)
-
-type NSXTClient struct {
-	cfg           Configuration
-	client        *Client
-	Context       context.Context
-	common        Service
-	defaultHeader map[string]string
-
-	// Services
-	ApiServiceNSXT *nsxt.ApiServiceNSXT
-}
-
-type Service struct {
-	client *NSXTClient
-}
-
-type Configuration struct {
-	BasePath string
-	Username string
-	Password string
-	Insecure bool
-}
-
-type ErrorMessage struct {
-	ModuleName   string         `json:"module_name,omitempty"`
-	Message      string         `json:"error_message,omitempty"`
-	RelatedError []RelatedError `json:"related_errors,omitempty"`
-}
-
-type RelatedError struct {
-	HttpStatus   string `json:"httpStatus,omitempty"`
-	ErrorCode    int    `json:"error_code,omitempty"`
-	ModuleName   string `json:"module_name,omitempty"`
-	ErrorMessage string `json:"error_message,omitempty"`
-}
-
-func SetContext(cfg Configuration) context.Context {
-	return context.WithValue(
-		context.Background(), ContextBaseAuth, BasicAuth{
-			Username: cfg.Username,
-			Password: cfg.Password,
-		},
-	)
-}
-func (c *NSXTClient) initSession() (err error) {
+func RequestNSXTApi(url, edge string) (r *http.Response, err error) {
 	var (
-		path     string
-		response *Response
+		user = configs.GetEnvKeys(fmt.Sprintf("%s_USERNAME", edge))
+		pass = configs.GetEnvKeys(fmt.Sprintf("%s_PASSWORD", edge))
 	)
 
-	path = fmt.Sprintf("%s/api/session/create", c.cfg.BasePath)
-
-	if response, err = c.client.Request(
-		POST, path, &Options{
-			Headers: map[string]string{
-				"Accept":       "application/json",
-				"Content-Type": "application/x-www-form-urlencoded",
-				"User-Agent":   "",
-			},
-			Ctx: c.Context,
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
 		},
-	); err != nil {
-		return
 	}
 
-	if c.defaultHeader == nil {
-		c.defaultHeader = make(map[string]string)
+	d := http.Client{
+		Timeout:   time.Second * 10,
+		Transport: tr,
 	}
 
-	for k, v := range response.Header {
-		if strings.ToLower(XSRF_TOKEN) == strings.ToLower(k) {
-			c.defaultHeader[XSRF_TOKEN] = v[0]
+	// Define retry attempts
+	maxRetries := 5
+
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			return nil, err
 		}
-	}
-	return
-}
 
-func (c *NSXTClient) RequestAPI(method, path string, options *Options) (r *Response, err error) {
-	path = fmt.Sprintf("%s%s", c.cfg.BasePath, path)
-	return c.client.Request(method, path, options)
-}
+		req.SetBasicAuth(user, pass)
+		req.Header.Add("Accept", "application/json")
+		req.Header.Add("Content-Type", "application/json")
 
-func NewNSXTClient(cfg Configuration) (c *NSXTClient, err error) {
-	c = &NSXTClient{}
+		res, err := d.Do(req)
 
-	if c.client, err = NewClient(); err != nil {
-		return
-	}
+		if err == nil {
+			return res, nil // Successful response, return
+		}
 
-	c.cfg = cfg
-	c.Context = SetContext(cfg)
-	c.common.client = c
+		// Handle error on attempt. Consider logging or specific checks here
+		log.Printf("Request failed on attempt %d: %v\n", attempt, err)
 
-	if err = c.initSession(); err != nil {
-		return
+		// Implement backoff strategy (optional)
+		time.Sleep(time.Second * 2) // Exponential backoff
 	}
 
-	c.ApiServiceNSXT = (*nsxt.ApiServiceNSXT)(&c.common)
-
-	return
+	// All retries failed, return final error
+	return nil, fmt.Errorf("failed to connect to NSX-T after %d attempts", maxRetries)
 }

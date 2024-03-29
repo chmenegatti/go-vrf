@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 
@@ -45,4 +46,49 @@ func ReadT0Json(filePath string) (JsonData, error) {
 	}
 
 	return data, nil
+}
+
+func SaveToFile(name string, result interface{}) error {
+	filename := fmt.Sprintf("%s.json", name)
+
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		// File doesn't exist, create it with appropriate permissions
+		f, err := os.Create(filename)
+		if err != nil {
+			return fmt.Errorf("error creating file:", err)
+		}
+		defer func(f *os.File) {
+			err := f.Close()
+			if err != nil {
+
+			}
+		}(f)
+	}
+
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return fmt.Errorf("error opening file: %v", err)
+	}
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+
+		}
+	}(f)
+
+	var tierName = make(map[string]interface{})
+	tierName[name] = result
+
+	jsonData, err := json.Marshal(tierName)
+	if err != nil {
+		return fmt.Errorf("error marshalling JSON data: %v", err)
+	}
+
+	_, err = f.Write(jsonData)
+	if err != nil {
+		return fmt.Errorf("error writing JSON data to file: %v", err)
+	}
+
+	fmt.Println("JSON data saved to:", filename)
+	return nil
 }
