@@ -1,4 +1,4 @@
 .idea/
 .env
-.json
-.http
+*.json
+*.http
