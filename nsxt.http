@@ -1,0 +1,4 @@
+GET https://tesp5nsx1p00001.tesp5infra.local/api/v1/edge-clusters
+Authorization: Basic YWRtaW46blN4LS1UQCFAZG0hbiNuc3hUQDUh
+
+###
