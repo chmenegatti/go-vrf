@@ -8,4 +8,5 @@ import (
 func SetupRoutes(app *fiber.App) {
 	app.Post("/generate-etcd-key", controller.GenerateEtcdKey)
 	app.Post("/create-organization-vrf", controller.CreateOrganizationVRF)
+	app.Post("/create-networks-vrf", controller.CreateNetworksProducts)
 }

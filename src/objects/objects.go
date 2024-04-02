@@ -18,3 +18,9 @@ type OrganizationVRF struct {
 	NameTier1 string `json:",omitempty"`
 	VrfName   string `json:",omitempty"`
 }
+
+type NetworksProdutcsVRF struct {
+	Edge      string   `json:",omitempty"`
+	NameTier1 string   `json:",omitempty"`
+	Products  []string `json:",omitempty"`
+}

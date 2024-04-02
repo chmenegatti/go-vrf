@@ -92,3 +92,28 @@ func SaveToFile(name string, result interface{}) error {
 	fmt.Println("JSON data saved to:", filename)
 	return nil
 }
+
+type JsonT1Data = map[string]model.Organizations
+
+func ReadT1Json(filePath string) (JsonT1Data, error) {
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		return JsonT1Data{}, err
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+
+		}
+	}(file)
+
+	var data JsonT1Data
+	reader := io.Reader(file)
+	err = json.NewDecoder(reader).Decode(&data)
+	if err != nil {
+		return JsonT1Data{}, err
+	}
+
+	return data, nil
+}
