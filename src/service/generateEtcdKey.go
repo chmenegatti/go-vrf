@@ -25,7 +25,7 @@ func GenerateEtcdKey(etcd objects.EdgeClusterEtcd) (data model.EdgeCluster, err 
 
 	for _, v := range ec.Results {
 		if v.DisplayName == etcd.NsxtEdgeClusterName {
-			data.NsxtTier0ID = v.Id
+			data.NsxtEdgeClusterID = v.Id
 			break
 		}
 	}

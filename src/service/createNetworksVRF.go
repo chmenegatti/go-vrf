@@ -63,7 +63,11 @@ func CreateNetworksVRF(obj objects.NetworksProdutcsVRF) (net []model.Networks, e
 			}
 		}
 
-		segmentId := fmt.Sprintf("DB-Shared_%s", key)
+		segmentId := net[idx].SegmentID
+
+		if strings.Contains(obj.NameTier1, "DB-Shared_") {
+			segmentId = fmt.Sprintf("DB-Shared_%s", key)
+		}
 
 		if pf, err = nsxt.GetProfiles(segmentId, edge); err != nil {
 			return

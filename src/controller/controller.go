@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
 	"go-vrf/src/model"
 	"go-vrf/src/objects"
 	"go-vrf/src/service"
 	utilities "go-vrf/src/utils"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func GenerateEtcdKey(c *fiber.Ctx) error {
