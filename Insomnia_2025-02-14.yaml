@@ -1,0 +1,523 @@
+_type: export
+__export_format: 4
+__export_date: 2025-02-14T13:38:28.128Z
+__export_source: insomnia.desktop.app:v9.3.3
+resources:
+  - _id: req_213426f29d08467789ecb23e7dd7b7e6
+    parentId: fld_91669ecfe9dd4c91a9cba36a5cb53783
+    modified: 1733361827581
+    created: 1711634835685
+    url: "{{ _.novaApi }}/generate-etcd-key"
+    name: EtcdKey
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"Edge": "TESP6",
+        	"NsxtEdgeClusterName": "EC-Cluster_3",
+        	"VrfName": "T0-Cluster_3",
+        	"TransportZoneName": "TZ-Overlay",
+        	"VirtualFirewall": "fortinet-3",
+        	"FirewallExternalAddress": "public_T0-Cluster_7",
+        	"RubrikDatabaseCluster": "bkp-pd-0011"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/8.5.1
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1711634835685
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_91669ecfe9dd4c91a9cba36a5cb53783
+    parentId: wrk_a501c1dc1d354de0bbf6da06d6cf10ae
+    modified: 1711634822565
+    created: 1711634822565
+    name: Nova API
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1711634822565
+    _type: request_group
+  - _id: wrk_a501c1dc1d354de0bbf6da06d6cf10ae
+    parentId: null
+    modified: 1722858711177
+    created: 1722858711177
+    name: New VRF
+    description: ""
+    scope: collection
+    _type: workspace
+  - _id: req_7284aee4de9b4e66bf1041008506eb7e
+    parentId: fld_91669ecfe9dd4c91a9cba36a5cb53783
+    modified: 1733361847791
+    created: 1711675878880
+    url: "{{ _.novaApi }}/create-organization-vrf"
+    name: Organization
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"Edge": "TESP6",
+        	"NameTier1": "DB-Shared_7",
+        	"VrfName": "T0-Cluster_3"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/8.5.1
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1709524085670
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_c963fab6fe554663bf32fb7652fb2f8d
+    parentId: fld_91669ecfe9dd4c91a9cba36a5cb53783
+    modified: 1733361875724
+    created: 1711980711571
+    url: "{{ _.novaApi }}/create-networks-vrf"
+    name: Networks
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"Edge": "TESP6",
+        	"NameTier1": "DB-Shared_7",
+        	"Products": [
+        		"Fluig-Dev-7",
+        		"Fluig-Prod-7",
+        		"Protheus-Dev-7",
+        		"Protheus-Prod-7",
+        		"RM-Dev-7",
+        		"RM-Prod-7"
+        	]
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/8.5.1
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1708468710662.5
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_49a0ac6f052c4181bb3451dc48f8f9fa
+    parentId: fld_540e69e3f36b4d33abdea9676a602bf0
+    modified: 1682010842592
+    created: 1675345959115
+    url: https://10.108.25.11/nostromo/api/tier
+    name: New Request
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers:
+      - name: accept
+        value: application/json
+        id: pair_018031725a5e4bb6b14635a1d7dc0a78
+      - id: pair_93761e1eca20443189714ea720a5e01d
+        name: Authenticate
+        value: Bearer {% response 'body', 'req_3e7d5b522a4c4b5191bb82cd3cc30248',
+          'b64::JC50b2tlbg==::46b', 'always', 60 %}
+        description: ""
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1675345959115
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_540e69e3f36b4d33abdea9676a602bf0
+    parentId: wrk_a501c1dc1d354de0bbf6da06d6cf10ae
+    modified: 1659617513527
+    created: 1659617513527
+    name: Nostromo
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1659617513527
+    _type: request_group
+  - _id: req_bd18da9d810d46c1ab16417d91e83f60
+    parentId: fld_540e69e3f36b4d33abdea9676a602bf0
+    modified: 1730385178260
+    created: 1659617516252
+    url: https://10.114.25.11/nostromo/api/tier
+    name: GetNemesisTier
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers:
+      - id: pair_4931b60d062946aba7afb7734865eac5
+        name: Authorization
+        value: Bearer {% response 'body', 'req_e75961bb43a64605a778440c48ab3741',
+          'b64::JC50b2tlbg==::46b', 'always', 60 %}
+        description: ""
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1659617516252
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_9ff176cd8e1b43d5b2ccc7a209e47397
+    parentId: fld_540e69e3f36b4d33abdea9676a602bf0
+    modified: 1730385049864
+    created: 1730372600670
+    url: https://10.114.25.11/nostromo/api/tier/
+    name: CreateNemesisTier
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"nemesisId": "19c07b84-11dc-4aea-8925-138317223000",
+        	"nemesisOranizationId": "420226ed-b596-42f3-a842-aafc18b53b63",
+        	"netIdFluigDev": "68524c81-922a-4730-b16c-cc4a7673f0e0",
+        	"netIdFluigPro": "8fa2631b-9b73-4d85-981e-28ba5c3a8413",
+        	"netIdProtheusDev": "84a1f592-afee-4b31-a8f0-793487578005",
+        	"netIdProtheusPro": "cbc32c88-1554-4660-8aea-e3560e67fe67",
+        	"netIdRmDev": "e1971ec7-4ea0-4ded-94cd-322d8e6a7a83",
+        	"netIdRmPro": "3d1e6211-94c5-4d3a-bdad-96f0c36546e9"
+        }
+    parameters: []
+    headers:
+      - id: pair_4931b60d062946aba7afb7734865eac5
+        name: Authorization
+        value: Bearer {% response 'body', 'req_e75961bb43a64605a778440c48ab3741',
+          'b64::JC50b2tlbg==::46b', 'always', 60 %}
+        description: ""
+      - name: Content-Type
+        value: application/json
+        id: pair_f890a09532aa403d91c6d9afb30a9f55
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1658998255527.5
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_f4288ec4aa6244589d631846eafa8a6b
+    parentId: fld_540e69e3f36b4d33abdea9676a602bf0
+    modified: 1730384955822
+    created: 1730384243425
+    url: https://10.114.25.11/nostromo/api/tier/19c07b84-11dc-4aea-8925-138317223000
+    name: DeleteNemesisTier
+    description: ""
+    method: DELETE
+    body: {}
+    parameters: []
+    headers:
+      - id: pair_4931b60d062946aba7afb7734865eac5
+        name: Authorization
+        value: Bearer {% response 'body', 'req_e75961bb43a64605a778440c48ab3741',
+          'b64::JC50b2tlbg==::46b', 'always', 60 %}
+        description: ""
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1658688625165.25
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_e75961bb43a64605a778440c48ab3741
+    parentId: fld_540e69e3f36b4d33abdea9676a602bf0
+    modified: 1724854545130
+    created: 1659618122792
+    url: https://10.108.25.11/nostromo/Users/authenticate
+    name: Session
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "username": "nemesis",
+          "password": "xKBG}Lu8?{3.?mxc"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_b1c65ab66ee04e7ca0f2b55772947123
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1658378994803
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_b263fd76a3134905ad53cb8de6361494
+    parentId: fld_540e69e3f36b4d33abdea9676a602bf0
+    modified: 1677527247316
+    created: 1670956247228
+    url: https://172.18.204.10/nostromo/Users/authenticate
+    name: Session Tesp2
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "username": "nemesis",
+          "password": "xKBG}Lu8?{3.?mxc"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_b1c65ab66ee04e7ca0f2b55772947123
+    authentication: {}
+    preRequestScript: ""
+    metaSortKey: -1657759734078.5
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_a5aaa8a75295492781002e6286036b55
+    parentId: wrk_a501c1dc1d354de0bbf6da06d6cf10ae
+    modified: 1657225213791
+    created: 1657140470081
+    name: Base Environment
+    data: {}
+    dataPropertyOrder: {}
+    color: null
+    isPrivate: false
+    metaSortKey: 1657140470081
+    _type: environment
+  - _id: jar_bc32bc9cb3744706bdff678428d451a6
+    parentId: wrk_a501c1dc1d354de0bbf6da06d6cf10ae
+    modified: 1736076444307
+    created: 1657140470083
+    name: Default Jar
+    cookies:
+      - key: JSESSIONID
+        value: E405C83CA17DF3D9317188050D2B1B5B
+        domain: 10.100.29.200
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2022-07-06T20:51:31.043Z
+        lastAccessed: 2023-09-05T16:59:49.414Z
+        id: cd353706-1fd1-4de4-b546-dd410de6ac81
+      - key: JSESSIONID
+        value: A8604DE5E1EE7B48B961F7505C5C0C59
+        domain: 172.18.137.235
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2022-07-14T18:47:21.354Z
+        lastAccessed: 2023-10-10T14:46:11.051Z
+        id: f7998877-413a-43e5-8bf7-fba65ce292e1
+      - key: JSESSIONID
+        value: 5BB1BB5F1CA3CCF7DB99E4AA1423F98C
+        domain: nsx-manager.tesp2infra.local
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2022-09-01T18:19:59.603Z
+        lastAccessed: 2024-12-16T18:37:25.777Z
+        id: 35b6af2d-54b1-42cd-92c2-a17b9a379889
+      - key: JSESSIONID
+        value: 243FBD2AD3C43DF552EC63F78C2F5356
+        domain: 172.18.214.31
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2022-09-01T18:21:57.253Z
+        lastAccessed: 2024-05-16T01:24:39.989Z
+        id: fe2b8ada-d474-4f00-a560-4b13eb6aa355
+      - key: JSESSIONID
+        value: 0EABC82AD864F8A39CFF22CE12578919
+        domain: 10.108.36.200
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2023-04-12T18:51:58.348Z
+        lastAccessed: 2024-03-29T02:11:08.601Z
+        id: 07094d5b-b071-4001-b600-7a6a41abd554
+      - key: JSESSIONID
+        value: 49E14425C74BCA28D64AB7457DE61D90
+        domain: tesp3nsx1p00001.tesp3infra.local
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2023-06-16T11:54:14.337Z
+        lastAccessed: 2025-01-05T11:27:24.307Z
+        id: a91a5ef1-618f-4a5b-a502-92186ae15de3
+      - key: JSESSIONID
+        value: E2DCB477BEC031111392FEEFE036C829
+        domain: 10.103.29.200
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2023-06-22T04:57:54.456Z
+        lastAccessed: 2023-08-07T17:42:33.828Z
+        id: 1e6cfb7c-a90a-43cd-9dcf-f8f2501341eb
+      - key: JSESSIONID
+        value: BC15A3E59BC034E6DD8BC8DB4966F3B9
+        domain: tesp5nsx1p00001.tesp5infra.local
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2023-06-22T14:35:39.306Z
+        lastAccessed: 2024-12-16T17:18:24.303Z
+        id: b5d60a40-fc99-474f-97d1-368cd9103a8f
+      - key: JSESSIONID
+        value: BE7FAACC9FC92BC1DF16B3F53BE91AD6
+        domain: 10.114.36.200
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2024-06-26T13:20:03.758Z
+        lastAccessed: 2024-06-28T14:53:14.116Z
+        sameSite: lax
+        id: c79be77b-1282-4a84-9f0b-4accaea1a132
+      - key: JSESSIONID
+        value: 2CD06800EEC161D3462BF511998A1B05
+        domain: tesp6nsx1p00001.tesp6infra.local
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2024-08-07T23:21:58.211Z
+        lastAccessed: 2024-12-16T17:33:06.854Z
+        sameSite: lax
+        id: 4881ce8c-0f6a-42e9-b9c9-d130d2ccdf32
+      - key: JSESSIONID
+        value: AF7153A72BEAE0BD8549D245C9286140
+        domain: nsx-manager-ce.tece1infra.local
+        path: /
+        secure: true
+        httpOnly: true
+        hostOnly: true
+        creation: 2024-12-16T18:51:14.014Z
+        lastAccessed: 2024-12-17T17:40:02.546Z
+        sameSite: lax
+        id: e25f0796-cea0-4b39-976f-feba3432690c
+    _type: cookie_jar
+  - _id: env_31354af9d608452195849c2bbaf91d7a
+    parentId: env_a5aaa8a75295492781002e6286036b55
+    modified: 1734375033062
+    created: 1657225216053
+    name: Dev
+    data:
+      baseURL: localhost:3333
+      tesp3url: https://tesp3nsx1p00001.tesp3infra.local
+      tesp3user: admin
+      tesp3pass: nSx--T@!@dm!n#nsxT@2!
+      tesp5url: https://tesp5nsx1p00001.tesp5infra.local
+      tesp5user: admin
+      tesp5pass: nSx--T@!@dm!n#nsxT@5!
+      tesp6url: https://tesp6nsx1p00001.tesp6infra.local
+      tesp6user: apiuser
+      tesp6pass: U75j9p9s@MB8xTV
+      tesp2url: https://nsx-manager.tesp2infra.local
+      tesp2user: admin
+      tesp2pass: $hak@d3V!rg&m
+      tece1url: https://nsx-manager-ce.tece1infra.local
+      tece1user: admin
+      tece1pass: $hak@d3V!rg&m
+      poc: https://172.18.137.235
+      tesp4: https://10.103.29.200
+      pass4: nSxsp4T@!@dm!n#nsxT@2!
+      novaApi: localhost:4000
+    dataPropertyOrder:
+      "&":
+        - baseURL
+        - tesp3url
+        - tesp3user
+        - tesp3pass
+        - tesp5url
+        - tesp5user
+        - tesp5pass
+        - tesp6url
+        - tesp6user
+        - tesp6pass
+        - tesp2url
+        - tesp2user
+        - tesp2pass
+        - tece1url
+        - tece1user
+        - tece1pass
+        - poc
+        - tesp4
+        - pass4
+        - novaApi
+    color: "#04f500"
+    isPrivate: false
+    metaSortKey: 1657225216053
+    _type: environment
