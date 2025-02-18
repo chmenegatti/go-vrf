@@ -224,7 +224,7 @@ func GetLogicalSwitchs(edge string) (switchIds LogicalSwitches, err error) {
 		res *http.Response
 	)
 
-	path := "/api/v1/logical-switches"
+	path := "/api/v1/logical-switches?sort_by=display_name"
 	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
 
 	if res, err = RequestNSXTApi(url, edge); err != nil {
@@ -305,7 +305,7 @@ func GetGroups(edge string) (groups Groups, err error) {
 		res *http.Response
 	)
 
-	path := "/policy/api/v1/infra/domains/default/groups"
+	path := "/policy/api/v1/infra/domains/default/groups?sort_by=display_name"
 	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
 
 	if res, err = RequestNSXTApi(url, edge); err != nil {
