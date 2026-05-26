@@ -25,9 +25,12 @@ func GenerateUUIDs(quantidade int) []string {
 
 type JsonData = map[string]model.EdgeCluster
 
-func ReadT0Json(filePath string) (JsonData, error) {
+func ReadT0Json(name string) (JsonData, error) {
+	if err := ValidateFileName(name); err != nil {
+		return JsonData{}, err
+	}
 
-	file, err := os.Open(filePath)
+	file, err := os.Open(name + ".json")
 	if err != nil {
 		return JsonData{}, err
 	}
@@ -49,13 +52,16 @@ func ReadT0Json(filePath string) (JsonData, error) {
 }
 
 func SaveToFile(name string, result interface{}) error {
+	if err := ValidateFileName(name); err != nil {
+		return err
+	}
 	filename := fmt.Sprintf("%s.json", name)
 
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		// File doesn't exist, create it with appropriate permissions
 		f, err := os.Create(filename)
 		if err != nil {
-			return fmt.Errorf("error creating file:", err)
+			return fmt.Errorf("error creating file: %w", err)
 		}
 		defer func(f *os.File) {
 			err := f.Close()
@@ -95,9 +101,12 @@ func SaveToFile(name string, result interface{}) error {
 
 type JsonT1Data = map[string]model.Organizations
 
-func ReadT1Json(filePath string) (JsonT1Data, error) {
+func ReadT1Json(name string) (JsonT1Data, error) {
+	if err := ValidateFileName(name); err != nil {
+		return JsonT1Data{}, err
+	}
 
-	file, err := os.Open(filePath)
+	file, err := os.Open(name + ".json")
 	if err != nil {
 		return JsonT1Data{}, err
 	}
