@@ -3,11 +3,36 @@ package nsxt
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"go-vrf/src/configs"
 )
+
+// fetch performs an authenticated GET against the NSX-T API for the given
+// edge and decodes the JSON response into T. It centralises URL building,
+// response-body handling, and error wrapping for every endpoint below.
+func fetch[T any](edge, path string) (T, error) {
+	var out T
+
+	base := configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge))
+	url := base + path
+
+	res, err := RequestNSXTApi(url, edge)
+	if err != nil {
+		return out, err
+	}
+	defer func() { _ = res.Body.Close() }()
+
+	if res.StatusCode != http.StatusOK {
+		return out, fmt.Errorf("nsxt GET %s: unexpected status %d", path, res.StatusCode)
+	}
+
+	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
+		return out, fmt.Errorf("nsxt GET %s: decode response: %w", path, err)
+	}
+
+	return out, nil
+}
 
 type EdgeCluster struct {
 	Results []struct {
@@ -21,34 +46,8 @@ type EdgeCluster struct {
 	} `json:"results"`
 }
 
-func GetEdgeCluster(edge string) (edgeCluster EdgeCluster, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/api/v1/edge-clusters"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return edgeCluster, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &edgeCluster)
-	if err != nil {
-		return
-	}
-
-	return edgeCluster, nil
+func GetEdgeCluster(edge string) (EdgeCluster, error) {
+	return fetch[EdgeCluster](edge, "/api/v1/edge-clusters")
 }
 
 type Tier0Gateway struct {
@@ -62,34 +61,8 @@ type Tier0Gateway struct {
 	} `json:"results"`
 }
 
-func GetTier0Gateways(edge string) (tier0 Tier0Gateway, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/policy/api/v1/infra/tier-0s"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return tier0, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &tier0)
-	if err != nil {
-		return
-	}
-
-	return tier0, nil
+func GetTier0Gateways(edge string) (Tier0Gateway, error) {
+	return fetch[Tier0Gateway](edge, "/policy/api/v1/infra/tier-0s")
 }
 
 type Tier1Gateway struct {
@@ -100,34 +73,8 @@ type Tier1Gateway struct {
 	}
 }
 
-func GetTier1Gateways(edge string) (tier1 Tier1Gateway, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/policy/api/v1/infra/tier-1s"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return tier1, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &tier1)
-	if err != nil {
-		return
-	}
-
-	return tier1, nil
+func GetTier1Gateways(edge string) (Tier1Gateway, error) {
+	return fetch[Tier1Gateway](edge, "/policy/api/v1/infra/tier-1s")
 }
 
 type DistributedFirewalPolicy struct {
@@ -139,35 +86,8 @@ type DistributedFirewalPolicy struct {
 	}
 }
 
-func GetDistributedFirewallPolicy(edge string) (dfp DistributedFirewalPolicy, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/policy/api/v1/infra/domains/default/security-policies"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return dfp, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &dfp)
-	if err != nil {
-		return
-	}
-
-	return dfp, nil
-
+func GetDistributedFirewallPolicy(edge string) (DistributedFirewalPolicy, error) {
+	return fetch[DistributedFirewalPolicy](edge, "/policy/api/v1/infra/domains/default/security-policies")
 }
 
 type TransportZones struct {
@@ -180,35 +100,8 @@ type TransportZones struct {
 	} `json:"results"`
 }
 
-func GetTransportZones(edge string) (transportZones TransportZones, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/api/v1/transport-zones"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return transportZones, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &transportZones)
-	if err != nil {
-		return
-	}
-
-	return transportZones, nil
-
+func GetTransportZones(edge string) (TransportZones, error) {
+	return fetch[TransportZones](edge, "/api/v1/infra/sites/default/enforcement-points/default/transport-zones")
 }
 
 type LogicalSwitches struct {
@@ -218,34 +111,8 @@ type LogicalSwitches struct {
 	}
 }
 
-func GetLogicalSwitchs(edge string) (switchIds LogicalSwitches, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/api/v1/logical-switches?sort_by=display_name"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return switchIds, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &switchIds)
-	if err != nil {
-		return
-	}
-
-	return switchIds, nil
+func GetLogicalSwitchs(edge string) (LogicalSwitches, error) {
+	return fetch[LogicalSwitches](edge, "/api/v1/logical-switches?sort_by=display_name")
 }
 
 type Segments struct {
@@ -261,34 +128,8 @@ type Segments struct {
 	} `json:"results"`
 }
 
-func GetSegments(edge string) (segments Segments, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/policy/api/v1/infra/segments"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return segments, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &segments)
-	if err != nil {
-		return
-	}
-
-	return segments, nil
+func GetSegments(edge string) (Segments, error) {
+	return fetch[Segments](edge, "/policy/api/v1/infra/segments")
 }
 
 type Groups struct {
@@ -299,34 +140,8 @@ type Groups struct {
 	}
 }
 
-func GetGroups(edge string) (groups Groups, err error) {
-
-	var (
-		res *http.Response
-	)
-
-	path := "/policy/api/v1/infra/domains/default/groups?sort_by=display_name"
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return groups, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &groups)
-	if err != nil {
-		return
-	}
-
-	return groups, nil
+func GetGroups(edge string) (Groups, error) {
+	return fetch[Groups](edge, "/policy/api/v1/infra/domains/default/groups?sort_by=display_name")
 }
 
 type Profiles struct {
@@ -340,31 +155,7 @@ type Profiles struct {
 	} `json:"results"`
 }
 
-func GetProfiles(segmentId, edge string) (profiles Profiles, err error) {
-	var (
-		res *http.Response
-	)
-
+func GetProfiles(segmentId, edge string) (Profiles, error) {
 	path := fmt.Sprintf("/policy/api/v1/infra/segments/%s/segment-discovery-profile-binding-maps", segmentId)
-	url := fmt.Sprintf("%s%s", configs.GetEnvKeys(fmt.Sprintf("%s_BASEPATH", edge)), path)
-
-	if res, err = RequestNSXTApi(url, edge); err != nil {
-		return profiles, err
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(res.Body)
-
-	err = json.Unmarshal(bodyBytes, &profiles)
-	if err != nil {
-		return
-	}
-
-	return profiles, nil
+	return fetch[Profiles](edge, path)
 }
