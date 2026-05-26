@@ -55,7 +55,7 @@ func SaveToFile(name string, result interface{}) error {
 		// File doesn't exist, create it with appropriate permissions
 		f, err := os.Create(filename)
 		if err != nil {
-			return fmt.Errorf("error creating file:", err)
+			return fmt.Errorf("error creating file: %w", err)
 		}
 		defer func(f *os.File) {
 			err := f.Close()
