@@ -98,7 +98,7 @@ func CreateOrganizationVRF(c *fiber.Ctx) error {
 
 	uuids := utilities.GenerateUUIDs(2)
 
-	jsonData, err := utilities.ReadT0Json(fmt.Sprintf("%s.json", payload.VrfName))
+	jsonData, err := utilities.ReadT0Json(payload.VrfName)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
@@ -175,7 +175,7 @@ func CreateNetworksProducts(c *fiber.Ctx) error {
 
 	uuids := utilities.GenerateUUIDs(6)
 
-	jsonData, err := utilities.ReadT1Json(fmt.Sprintf("%s.json", payload.NameTier1))
+	jsonData, err := utilities.ReadT1Json(payload.NameTier1)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
