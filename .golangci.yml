@@ -1,0 +1,47 @@
+version: "2"
+
+run:
+  timeout: 5m
+  go: "1.22"
+
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - ineffassign
+    - unused
+    - gosec
+    - misspell
+    - unconvert
+    - prealloc
+  exclusions:
+    rules:
+      # Test files: relax some checks
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+      # Generated code, vendored, etc.
+      - path: vendor/
+        linters: [all]
+
+  settings:
+    gosec:
+      # G402 (TLS InsecureSkipVerify): allowed because we guard it behind
+      # NSXT_SKIP_TLS_VERIFY env var with a runtime warning (see #3).
+      excludes:
+        - G402
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes: ["go-vrf"]
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
