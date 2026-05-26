@@ -135,10 +135,17 @@ func CreateOrganizationVRF(c *fiber.Ctx) error {
 		)
 	}
 
+	sqlStmt, err := organizationsInsert(result)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{"message": fmt.Sprintf("invalid value in organization fields: %v", err)},
+		)
+	}
+
 	return c.Status(fiber.StatusOK).JSON(
 		fiber.Map{
 			"data": result,
-			"sql":  organizationsInsert(result),
+			"sql":  sqlStmt,
 		},
 	)
 }
@@ -193,38 +200,67 @@ func CreateNetworksProducts(c *fiber.Ctx) error {
 		)
 	}
 
+	sqlStmts, err := networksInsert(net)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{"message": fmt.Sprintf("invalid value in network fields: %v", err)},
+		)
+	}
+
 	return c.Status(fiber.StatusOK).JSON(
 		fiber.Map{
 			"data": net,
-			"sql":  networksInsert(net),
+			"sql":  sqlStmts,
 		},
 	)
 
 }
 
-func organizationsInsert(o model.Organizations) string {
-	return fmt.Sprintf(
-		"INSERT INTO organizations (id, name, description, tier_provider, tier_provider_id, edge_cluster, tier1_gateway_id, policy_id, locale_service_id, load_balance_id, backup_cluster, physical_firewall, virtual_firewall, firewall_external_address, load_balance_size, status) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');",
-		o.Id, o.Name, o.Description, o.TierProvider, o.TierProviderID, o.EdgeCluster, o.Tier1GatewayID, o.PolicyID,
-		o.LocaleServiceID, o.LoadBalanceID, o.BackupCluster, o.PhysicalFirewall, o.VirtualFirewall,
-		o.FirewallExternalAddress, o.LoadBalanceSize, o.Status,
+func organizationsInsert(o model.Organizations) (string, error) {
+	values, err := escapeAll(
+		o.Id, o.Name, o.Description, o.TierProvider, o.TierProviderID, o.EdgeCluster,
+		o.Tier1GatewayID, o.PolicyID, o.LocaleServiceID, o.LoadBalanceID, o.BackupCluster,
+		o.PhysicalFirewall, o.VirtualFirewall, o.FirewallExternalAddress, o.LoadBalanceSize, o.Status,
 	)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf(
+		"INSERT INTO organizations (id, name, description, tier_provider, tier_provider_id, edge_cluster, tier1_gateway_id, policy_id, locale_service_id, load_balance_id, backup_cluster, physical_firewall, virtual_firewall, firewall_external_address, load_balance_size, status) VALUES (%s);",
+		strings.Join(values, ", "),
+	), nil
 }
 
-func networksInsert(n []model.Networks) []string {
-	var (
-		sqlString []string
-	)
-
+func networksInsert(n []model.Networks) ([]string, error) {
+	out := make([]string, 0, len(n))
 	for _, v := range n {
-		sqlString = append(
-			sqlString, fmt.Sprintf(
-				"INSERT INTO networks (id, organization, name, description, address, segment_id, switch_id, group_id, profile_id, display_name, enable_side_communication, status) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %t, '%s');",
-				v.Id, v.Organization, v.Name, v.Description, v.Address, v.SegmentID, v.SwitchID, v.GroupID, v.ProfileID,
-				v.DisplayName, v.EnableSideCommunication, v.Status,
-			),
+		values, err := escapeAll(
+			v.Id, v.Organization, v.Name, v.Description, v.Address, v.SegmentID,
+			v.SwitchID, v.GroupID, v.ProfileID, v.DisplayName,
 		)
+		if err != nil {
+			return nil, err
+		}
+		statusLit, err := utilities.EscapeLiteral(v.Status)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, fmt.Sprintf(
+			"INSERT INTO networks (id, organization, name, description, address, segment_id, switch_id, group_id, profile_id, display_name, enable_side_communication, status) VALUES (%s, %t, %s);",
+			strings.Join(values, ", "), v.EnableSideCommunication, statusLit,
+		))
 	}
+	return out, nil
+}
 
-	return sqlString
+func escapeAll(vals ...string) ([]string, error) {
+	out := make([]string, len(vals))
+	for i, v := range vals {
+		lit, err := utilities.EscapeLiteral(v)
+		if err != nil {
+			return nil, fmt.Errorf("field %d: %w", i, err)
+		}
+		out[i] = lit
+	}
+	return out, nil
 }
