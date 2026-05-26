@@ -1,3 +1,10 @@
+//go:build integration
+
+// These tests hit a live NSX-T appliance (edge "TESP5") and require
+// valid credentials in the environment. They are excluded from the
+// default `go test ./...` run. To execute them:
+//
+//	go test -tags=integration ./src/nsxt/...
 package nsxt
 
 import (
