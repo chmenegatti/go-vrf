@@ -196,10 +196,25 @@ Go-vrf is a robust open-source project that simplifies network service managemen
 
 ###  Tests
 
-> Run the test suite using the command below:
+> Run the unit test suite (live NSX-T integration tests are excluded):
 > ```console
-> $ go test
+> $ make test
 > ```
+> Integration tests hit a real NSX-T appliance and need credentials:
+> ```console
+> $ make test-integration
+> ```
+
+---
+
+##  Conventions
+
+- **Code and code comments are written in English.** User-facing docs may
+  be in Portuguese.
+- **Before opening a PR**, run the full check suite and make sure it is green:
+  ```console
+  $ make check   # fmt + vet + lint + test
+  ```
 
 ---
 
@@ -231,7 +246,7 @@ Contributions are welcome! Here are several ways you can contribute:
    ```sh
    git checkout -b new-feature-x
    ```
-4. **Make Your Changes**: Develop and test your changes locally.
+4. **Make Your Changes**: Develop and test your changes locally. Run `make check` before committing.
 5. **Commit Your Changes**: Commit with a clear message describing your updates.
    ```sh
    git commit -m 'Implemented new feature x.'

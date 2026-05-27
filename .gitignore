@@ -1,5 +1,14 @@
+# Editors
 .idea/
+
+# Secrets / local config
 .env
+
+# Runtime artifacts produced by the server
 *.http
-*.json 
+*.json
 *.txt
+
+# Build & test output
+/go-vrf
+coverage.out
