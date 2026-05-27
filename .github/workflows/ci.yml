@@ -40,9 +40,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    # Initial roll-out: don't block PRs while historical issues are
-    # tracked in GitHub issues. Flip to required once #5-#30 are closed.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
