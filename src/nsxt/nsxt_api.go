@@ -34,125 +34,145 @@ func fetch[T any](edge, path string) (T, error) {
 	return out, nil
 }
 
+type EdgeClusterMember struct {
+	DeploymentType string `json:"deployment_type"`
+	MemberNodeType string `json:"member_node_type"`
+	ResourceType   string `json:"resource_type"`
+	Id             string `json:"id"`
+	DisplayName    string `json:"display_name"`
+	Description    string `json:"description"`
+	CreateUser     string `json:"_create_user"`
+}
+
 type EdgeCluster struct {
-	Results []struct {
-		DeploymentType string `json:"deployment_type"`
-		MemberNodeType string `json:"member_node_type"`
-		ResourceType   string `json:"resource_type"`
-		Id             string `json:"id"`
-		DisplayName    string `json:"display_name"`
-		Description    string `json:"description"`
-		CreateUser     string `json:"_create_user"`
-	} `json:"results"`
+	Results []EdgeClusterMember `json:"results"`
 }
 
 func GetEdgeCluster(edge string) (EdgeCluster, error) {
 	return fetch[EdgeCluster](edge, "/api/v1/edge-clusters")
 }
 
+type Tier0 struct {
+	ResourceType string `json:"resource_type"`
+	Id           string `json:"id"`
+	DisplayName  string `json:"display_name"`
+	Path         string `json:"path"`
+	ParentPath   string `json:"parent_path"`
+	RelativePath string `json:"relative_path"`
+}
+
 type Tier0Gateway struct {
-	Results []struct {
-		ResourceType string `json:"resource_type"`
-		Id           string `json:"id"`
-		DisplayName  string `json:"display_name"`
-		Path         string `json:"path"`
-		ParentPath   string `json:"parent_path"`
-		RelativePath string `json:"relative_path"`
-	} `json:"results"`
+	Results []Tier0 `json:"results"`
 }
 
 func GetTier0Gateways(edge string) (Tier0Gateway, error) {
 	return fetch[Tier0Gateway](edge, "/policy/api/v1/infra/tier-0s")
 }
 
+type Tier1 struct {
+	Id          string `json:"id"`
+	DisplayName string `json:"display_name"`
+	Path        string `json:"path"`
+}
+
 type Tier1Gateway struct {
-	Results []struct {
-		Id          string `json:"id"`
-		DisplayName string `json:"display_name"`
-		Path        string `json:"path"`
-	}
+	Results []Tier1 `json:"results"`
 }
 
 func GetTier1Gateways(edge string) (Tier1Gateway, error) {
 	return fetch[Tier1Gateway](edge, "/policy/api/v1/infra/tier-1s")
 }
 
-type DistributedFirewalPolicy struct {
-	Results []struct {
-		Id           string `json:"id"`
-		DisplayName  string `json:"display_name"`
-		Path         string `json:"path"`
-		RelativePath string `json:"relative_path"`
-	}
+type SecurityPolicy struct {
+	Id           string `json:"id"`
+	DisplayName  string `json:"display_name"`
+	Path         string `json:"path"`
+	RelativePath string `json:"relative_path"`
 }
 
-func GetDistributedFirewallPolicy(edge string) (DistributedFirewalPolicy, error) {
-	return fetch[DistributedFirewalPolicy](edge, "/policy/api/v1/infra/domains/default/security-policies")
+type DistributedFirewallPolicy struct {
+	Results []SecurityPolicy `json:"results"`
+}
+
+func GetDistributedFirewallPolicy(edge string) (DistributedFirewallPolicy, error) {
+	return fetch[DistributedFirewallPolicy](edge, "/policy/api/v1/infra/domains/default/security-policies")
+}
+
+type TransportZone struct {
+	Id             string `json:"id"`
+	ResourceType   string `json:"resource_type"`
+	TransportType  string `json:"transport_type"`
+	HostSwitchName string `json:"host_switch_name"`
+	DisplayName    string `json:"display_name"`
 }
 
 type TransportZones struct {
-	Results []struct {
-		Id             string `json:"id"`
-		ResourceType   string `json:"resource_type"`
-		TransportType  string `json:"transport_type"`
-		HostSwitchName string `json:"host_switch_name"`
-		DisplayName    string `json:"display_name"`
-	} `json:"results"`
+	Results []TransportZone `json:"results"`
 }
 
 func GetTransportZones(edge string) (TransportZones, error) {
 	return fetch[TransportZones](edge, "/api/v1/infra/sites/default/enforcement-points/default/transport-zones")
 }
 
-type LogicalSwitches struct {
-	Results []struct {
-		Id          string `json:"id,omitempty"`
-		DisplayName string `json:"display_name,omitempty"`
-	}
+type LogicalSwitch struct {
+	Id          string `json:"id,omitempty"`
+	DisplayName string `json:"display_name,omitempty"`
 }
 
-func GetLogicalSwitchs(edge string) (LogicalSwitches, error) {
+type LogicalSwitches struct {
+	Results []LogicalSwitch `json:"results"`
+}
+
+func GetLogicalSwitches(edge string) (LogicalSwitches, error) {
 	return fetch[LogicalSwitches](edge, "/api/v1/logical-switches?sort_by=display_name")
 }
 
+type Subnet struct {
+	GatewayAddress string `json:"gateway_address"`
+	Network        string `json:"network"`
+}
+
+type Segment struct {
+	Id           string   `json:"id,omitempty"`
+	DisplayName  string   `json:"display_name"`
+	Path         string   `json:"path"`
+	ResourceType string   `json:"resource_type"`
+	Subnets      []Subnet `json:"subnets"`
+}
+
 type Segments struct {
-	Results []struct {
-		Id           string `json:"id,omitempty"`
-		DisplayName  string `json:"display_name"`
-		Path         string `json:"path"`
-		ResourceType string `json:"resource_type"`
-		Subnets      []struct {
-			GatwayAddress string `json:"gateway_address"`
-			Network       string `json:"network"`
-		} `json:"subnets"`
-	} `json:"results"`
+	Results []Segment `json:"results"`
 }
 
 func GetSegments(edge string) (Segments, error) {
 	return fetch[Segments](edge, "/policy/api/v1/infra/segments")
 }
 
+type Group struct {
+	Id          string `json:"id,omitempty"`
+	DisplayName string `json:"display_name"`
+	Path        string `json:"path"`
+}
+
 type Groups struct {
-	Results []struct {
-		Id          string `json:"id,omitempty"`
-		DisplayName string `json:"display_name"`
-		Path        string `json:"path"`
-	}
+	Results []Group `json:"results"`
 }
 
 func GetGroups(edge string) (Groups, error) {
 	return fetch[Groups](edge, "/policy/api/v1/infra/domains/default/groups?sort_by=display_name")
 }
 
+type Profile struct {
+	ResourceType string `json:"resource_type,omitempty"`
+	Id           string `json:"id,omitempty"`
+	DisplayName  string `json:"display_name,omitempty"`
+	Path         string `json:"path,omitempty"`
+	RelativePath string `json:"relative_path,omitempty"`
+	ParentPath   string `json:"parent_path,omitempty"`
+}
+
 type Profiles struct {
-	Results []struct {
-		ResourceType string `json:"resource_type,omitempty"`
-		Id           string `json:"id,omitempty"`
-		DisplayName  string `json:"display_name,omitempty"`
-		Path         string `json:"path,omitempty"`
-		RelativePath string `json:"relative_path,omitempty"`
-		ParentPath   string `json:"parent_path,omitempty"`
-	} `json:"results"`
+	Results []Profile `json:"results"`
 }
 
 func GetProfiles(segmentId, edge string) (Profiles, error) {

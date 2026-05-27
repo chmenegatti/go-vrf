@@ -1,21 +1,21 @@
 package model
 
 type EdgeCluster struct {
-	Index                   int    `json:",omitempty"`
-	NsxtTier0ID             string `json:",omitempty"`
-	NsxtTier0DisplayName    string `json:",omitempty"`
-	NsxtEdgeClusterID       string `json:",omitempty"`
-	GatewayEdgeClusterID    string `json:",omitempty"`
-	NsxtTransportZoneID     string `json:",omitempty"`
-	DatabaseTierID          string `json:",omitempty"`
-	PhysicalFirewall        string `json:",omitempty"`
-	VirtualFirewall         string `json:",omitempty"`
-	VpnSite                 string `json:",omitempty"`
-	FirewallExternalAddress string `json:",omitempty"`
-	MaxOrganization         int    `json:",omitempty"`
-	Enable                  bool   `json:",omitempty"`
-	RubrikDatabaseCluster   string `json:",omitempty"`
-	NextHopVpn              string `json:",omitempty"`
+	Index                   int    `json:"index,omitempty"`
+	NsxtTier0ID             string `json:"nsxt_tier0_id,omitempty"`
+	NsxtTier0DisplayName    string `json:"nsxt_tier0_display_name,omitempty"`
+	NsxtEdgeClusterID       string `json:"nsxt_edge_cluster_id,omitempty"`
+	GatewayEdgeClusterID    string `json:"gateway_edge_cluster_id,omitempty"`
+	NsxtTransportZoneID     string `json:"nsxt_transport_zone_id,omitempty"`
+	DatabaseTierID          string `json:"database_tier_id,omitempty"`
+	PhysicalFirewall        string `json:"physical_firewall,omitempty"`
+	VirtualFirewall         string `json:"virtual_firewall,omitempty"`
+	VpnSite                 string `json:"vpn_site,omitempty"`
+	FirewallExternalAddress string `json:"firewall_external_address,omitempty"`
+	MaxOrganization         int    `json:"max_organization,omitempty"`
+	Enable                  bool   `json:"enable,omitempty"`
+	RubrikDatabaseCluster   string `json:"rubrik_database_cluster,omitempty"`
+	NextHopVpn              string `json:"next_hop_vpn,omitempty"`
 }
 
 type Organizations struct {
