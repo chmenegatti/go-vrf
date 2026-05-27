@@ -5,282 +5,342 @@
     <h1 align="center">GO-VRF</h1>
 </p>
 <p align="center">
-    <em>Empowering network innovation through intuitive HTTP solutions.</em>
+    <em>API HTTP para provisionamento de VRFs e redes no NSX-T.</em>
 </p>
 <p align="center">
-	<img src="https://img.shields.io/github/license/chmenegatti/go-vrf.git?style=default&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
-	<img src="https://img.shields.io/github/last-commit/chmenegatti/go-vrf.git?style=default&logo=git&logoColor=white&color=0080ff" alt="last-commit">
-	<img src="https://img.shields.io/github/languages/top/chmenegatti/go-vrf.git?style=default&color=0080ff" alt="repo-top-language">
-	<img src="https://img.shields.io/github/languages/count/chmenegatti/go-vrf.git?style=default&color=0080ff" alt="repo-language-count">
-<p>
-<p align="center">
-	<!-- default option, no dependency badges. -->
+	<img src="https://img.shields.io/github/license/chmenegatti/go-vrf?style=default&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
+	<img src="https://img.shields.io/github/last-commit/chmenegatti/go-vrf?style=default&logo=git&logoColor=white&color=0080ff" alt="last-commit">
+	<img src="https://img.shields.io/github/languages/top/chmenegatti/go-vrf?style=default&color=0080ff" alt="repo-top-language">
+	<img src="https://img.shields.io/github/go-mod/go-version/chmenegatti/go-vrf?style=default&color=0080ff" alt="go-version">
 </p>
-
-<br><!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary><br>
-
-- [ Overview](#-overview)
-- [ Features](#-features)
-- [ Repository Structure](#-repository-structure)
-- [ Modules](#-modules)
-- [ Getting Started](#-getting-started)
-  - [ Installation](#-installation)
-  - [ Usage](#-usage)
-  - [ Tests](#-tests)
-- [ Project Roadmap](#-project-roadmap)
-- [ Contributing](#-contributing)
-- [ License](#-license)
-- [ Acknowledgments](#-acknowledgments)
-</details>
-<hr>
-
-##  Overview
-
-Go-vrf is a robust open-source project that simplifies network service management through HTTP with Fiber v2 and godotenv. It allows users to handle NSX-T integration efficiently by creating organization VRFs, generating keys, and managing edge clusters. The project promotes scalability and security by leveraging Fiber-based API routes, TLS for secure communication, and UUID generation. With a focus on modularity and organized request handling, go-vrf offers a valuable solution for streamlining network configuration tasks.
 
 ---
 
-##  Features
+## Sumário
 
-|    | Feature           | Description                                                                                                                                                                                                                                                                                                                                                              |
-|----|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ⚙️  | **Architecture**    | The project uses Fiber as the main web framework for handling HTTP services on port 4000. It integrates routes efficiently for network service handling. The codebase is organized into packages for NSX-T API operations, routes definition, services, utilities, and configurations.                                                                                             |
-| 🔩 | **Code Quality**    | The codebase exhibits clean and well-structured code following Go best practices. It leverages relevant packages for error handling, API request implementations, and secure communication. The codebase emphasizes readability and maintainability, reducing technical debt and enhancing overall quality.                              |
-| 📄 | **Documentation**   | The project includes detailed inline documentation within the source code files, aiding in understanding various functionalities. The repository also contains a go.mod file defining dependencies and their versions for consistency. However, there is room for improvement in providing external documentation for users and contributors.                   |
-| 🔌 | **Integrations**    | Key integrations include Fiber v2 for web framework capabilities, godotenv for environment variable management, fasthttp for efficient HTTP handling, and UUID generation for unique identifiers. External dependencies like brotli and uniseg are utilized for specific functionalities within the project.                          |
-| 🧩 | **Modularity**      | The codebase is structured into separate packages for distinct functionalities like NSX-T API operations, route definition, services, and utilities. This modular design promotes code reusability and maintainability, enabling easy extension and modification of different components without affecting the entire system.|
-| 🧪 | **Testing**         | The project utilizes test files within the src directory to conduct unit tests for NSX-T API endpoints and various service functions. The tests include error handling scenarios, ensuring robustness in handling edge cases and maintaining the expected behavior of the codebase.                                            |
-| ⚡️  | **Performance**     | The codebase demonstrates efficient resource usage and speed in handling network services via Fiber. API request implementations with retry logic, TLS for secure communication, and UUID generation contribute to improving performance and ensuring reliable connections within the project's architecture.                     |
-| 🛡️ | **Security**        | Security measures are implemented through TLS for secure communication, ensuring data protection in API requests. The use of environment variables managed by godotenv enhances access control to sensitive configurations. However, further security enhancements like input validation can be considered for strengthening data security. |
-| 📦 | **Dependencies**    | Key external dependencies include go-runewidth, go-colorable, and mod for additional functionalities. Dependencies like sys, bytebufferpool, and compress support various operations within the codebase. The project relies on go modules to manage dependencies effectively and ensure a stable ecosystem.                  |
+- [Visão geral](#visão-geral)
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura](#arquitetura)
+- [Estrutura do repositório](#estrutura-do-repositório)
+- [Pré-requisitos](#pré-requisitos)
+- [Configuração](#configuração)
+- [Executando](#executando)
+- [Endpoints da API](#endpoints-da-api)
+- [Fluxo de uso](#fluxo-de-uso)
+- [Testes](#testes)
+- [Convenções](#convenções)
+- [Contribuindo](#contribuindo)
+- [Licença](#licença)
 
 ---
 
-##  Repository Structure
+## Visão geral
+
+`go-vrf` é um serviço HTTP, escrito em Go com o framework [Fiber](https://gofiber.io/),
+que automatiza a configuração de **VRFs** (Virtual Routing and Forwarding) e redes
+em ambientes **VMware NSX-T**.
+
+O serviço consulta a API do NSX-T para resolver identificadores de recursos
+(edge clusters, transport zones, tier-0/tier-1 gateways, security policies,
+segments, groups, profiles e logical switches) a partir de nomes de exibição,
+monta os registros de domínio correspondentes, persiste o resultado em arquivos
+JSON e devolve os comandos SQL de inserção prontos para o sistema downstream.
+
+Suporta múltiplos ambientes NSX-T (ex.: `TESP2`, `TESP3`, `TESP5`, `TESP6`),
+selecionáveis por requisição através do campo `Edge`.
+
+---
+
+## Funcionalidades
+
+- **Resolução de recursos NSX-T** por nome de exibição via API REST.
+- **Três endpoints** que cobrem o fluxo de provisionamento: chave etcd → VRF de
+  organização → redes de produtos.
+- **Multi-ambiente**: credenciais e base path por prefixo de ambiente no `.env`.
+- **TLS configurável**: verificação de certificado habilitada por padrão, com
+  opção de CA bundle customizado ou bypass explícito.
+- **Resiliência**: cliente HTTP com retry em erros de rede e respostas `5xx`,
+  backoff exponencial e cancelamento via `context.Context`.
+- **Geração de SQL** de inserção (`organizations`, `networks`) com escape seguro
+  contra SQL injection.
+- **Servidor robusto**: middleware de `recover`, `logger` e `request-id`, além de
+  graceful shutdown.
+
+---
+
+## Arquitetura
+
+Requisição HTTP → **controller** (parse + resposta) → **service** (regra de
+negócio) → **nsxt** (cliente da API NSX-T) → NSX-T.
+
+| Pacote            | Responsabilidade                                                        |
+| ----------------- | ----------------------------------------------------------------------- |
+| `main`            | Sobe o Fiber, registra middleware e trata o graceful shutdown.          |
+| `src/routes`      | Mapeia os endpoints HTTP para os handlers.                              |
+| `src/controller`  | Faz parsing do payload, orquestra os services e monta a resposta/SQL.   |
+| `src/service`     | Regra de negócio: valida entrada e correlaciona dados do NSX-T.         |
+| `src/nsxt`        | Cliente HTTP autenticado + tipos de resposta da API NSX-T.              |
+| `src/model`       | Structs de domínio persistidas (EdgeCluster, Organizations, Networks).  |
+| `src/objects`     | Structs dos payloads de requisição.                                     |
+| `src/utils`       | UUIDs, leitura/escrita de JSON (com validação de nome) e escape de SQL. |
+| `src/configs`     | Carregamento de variáveis de ambiente (`.env` carregado uma vez).       |
+
+---
+
+## Estrutura do repositório
 
 ```sh
-└── go-vrf/
-    ├── go.mod
-    ├── go.sum
-    ├── main.go
-    └── src
-        ├── configs
-        ├── controller
-        ├── model
-        ├── nsxt
-        ├── objects
-        ├── routes
-        ├── service
-        └── utils
+go-vrf/
+├── main.go              # bootstrap do servidor Fiber
+├── Makefile             # alvos de build/test/lint
+├── go.mod / go.sum
+├── .env.example         # modelo de configuração
+├── .golangci.yml        # configuração do linter
+├── .github/workflows/   # CI (build, test, lint)
+├── docs/insomnia/       # coleção Insomnia da API
+└── src/
+    ├── configs/         # variáveis de ambiente
+    ├── controller/      # handlers HTTP
+    ├── model/           # structs de domínio
+    ├── nsxt/            # cliente da API NSX-T
+    ├── objects/         # payloads de requisição
+    ├── routes/          # registro de rotas
+    ├── service/         # regra de negócio
+    └── utils/           # utilitários (UUID, JSON, SQL)
 ```
 
 ---
 
-##  Modules
+## Pré-requisitos
 
-<details closed><summary>.</summary>
-
-| File                                                                     | Summary                                                                                                                                                                                                                               |
-| ---                                                                      | ---                                                                                                                                                                                                                                   |
-| [main.go](https://github.com/chmenegatti/go-vrf.git/blob/master/main.go) | Initializes a Fiber app, integrating routes to handle network services via HTTP on port 4000.                                                                                                                                         |
-| [go.mod](https://github.com/chmenegatti/go-vrf.git/blob/master/go.mod)   | Defines dependencies for go-vrf project, leveraging Fiber v2 and godotenv. Notable indirect dependencies include brotli, UUID, and fasthttp. Positioned in the root directory, reinforcing project stability and ecosystem coherence. |
-| [go.sum](https://github.com/chmenegatti/go-vrf.git/blob/master/go.sum)   | Defines dependencies and their versions for the project using modules. Ensures consistent versions of external packages for smooth functioning of the codebase.                                                                       |
-
-</details>
-
-<details closed><summary>src.nsxt</summary>
-
-| File                                                                                                | Summary                                                                                                                                                                                             |
-| ---                                                                                                 | ---                                                                                                                                                                                                 |
-| [nsxt_api_test.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/nsxt/nsxt_api_test.go) | Tests NSX-T API endpoints for various resources. Retrieves and prints Edge Clusters, Tier-0 Gateways, Transport Zones, Logical Switches, Segments, and Groups using test cases with error handling. |
-| [nsxt_api.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/nsxt/nsxt_api.go)           | GetEdgeCluster`, `GetTier0Gateways`, `GetSegments`, etc.                                                                                                                                            |
-| [client.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/nsxt/client.go)               | Implements NSX-T API request with retry logic and TLS for secure communication, ensuring successful connections in the go-vrf repositorys nsxt package.                                             |
-
-</details>
-
-<details closed><summary>src.routes</summary>
-
-| File                                                                                    | Summary                                                                                                                                                              |
-| ---                                                                                     | ---                                                                                                                                                                  |
-| [routes.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/routes/routes.go) | Defines routes for generating Etcd key and creating organization VRF in the parent repositorys Fiber-based API, facilitating modular and organized request handling. |
-
-</details>
-
-<details closed><summary>src.service</summary>
-
-| File                                                                                                                   | Summary                                                                                                                                                                                                           |
-| ---                                                                                                                    | ---                                                                                                                                                                                                               |
-| [generateEtcdKey.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/service/generateEtcdKey.go)             | Generates Edge Cluster and Transport Zone IDs from NSX-T based on provided data to streamline configuration handling.                                                                                             |
-| [createOrganizationVRF.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/service/createOrganizationVRF.go) | Creates organization Virtual Routing and Forwarding (VRF) based on provided name and edge. Retrieves Tier1 Gateway and Distributed Firewall Policy IDs from the NSX-T backend to associate with the organization. |
-
-</details>
-
-<details closed><summary>src.utils</summary>
-
-| File                                                                                         | Summary                                                                                                                                                          |
-| ---                                                                                          | ---                                                                                                                                                              |
-| [utilities.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/utils/utilities.go) | Generates UUIDs and reads/writes JSON data to files for the repositorys EdgeCluster model. Handles file I/O operations efficiently with UUID generation support. |
-
-</details>
-
-<details closed><summary>src.objects</summary>
-
-| File                                                                                       | Summary                                                                                                                                                                                                              |
-| ---                                                                                        | ---                                                                                                                                                                                                                  |
-| [objects.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/objects/objects.go) | Defines data structures for EdgeClusterEtcd and OrganizationVRF in the objects package. These structs model key attributes related to NSX-T edge clusters and organization VRFs within the repositorys architecture. |
-
-</details>
-
-<details closed><summary>src.configs</summary>
-
-| File                                                                               | Summary                                                                                                                                                   |
-| ---                                                                                | ---                                                                                                                                                       |
-| [env.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/configs/env.go) | Retrieves environment variables from a.env file using godotenv. Critical for accessing sensitive configurations in the open-source projects architecture. |
-
-</details>
-
-<details closed><summary>src.controller</summary>
-
-| File                                                                                                | Summary                                                                                                                                                                                                                                           |
-| ---                                                                                                 | ---                                                                                                                                                                                                                                               |
-| [controller.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/controller/controller.go) | Generates Etcd keys and creates Organization VRF, saving data to files. Handles request parsing, error responses, and UUID generation for cluster configuration. Enables efficient VRF and organization setup in the larger repository structure. |
-
-</details>
-
-<details closed><summary>src.model</summary>
-
-| File                                                                                   | Summary                                                                                                                                                                                                                                         |
-| ---                                                                                    | ---                                                                                                                                                                                                                                             |
-| [models.go](https://github.com/chmenegatti/go-vrf.git/blob/master/src/model/models.go) | Defines data structures for Edge Cluster, Organizations, and Networks with JSON annotations for API responses. Captures key attributes for managing NSX-T integration and organizational networking within the parent repositorys architecture. |
-
-</details>
+- **Go** 1.22 ou superior.
+- Acesso de rede e credenciais a um ou mais appliances **NSX-T**.
+- (Opcional) [`golangci-lint`](https://golangci-lint.run/) v2.10.x para rodar o lint localmente.
 
 ---
 
-##  Getting Started
+## Configuração
 
-**System Requirements:**
+A configuração é feita via variáveis de ambiente. Copie o modelo e preencha:
 
-* **Go**: `version x.y.z`
+```console
+$ cp .env.example .env
+```
 
-###  Installation
+Cada ambiente NSX-T usa um **prefixo** (ex.: `TESP5`) com três variáveis:
 
-<h4>From <code>source</code></h4>
+```dotenv
+TESP5_BASEPATH=https://nsx.exemplo.local
+TESP5_USERNAME=apiuser
+TESP5_PASSWORD=troque-me
+```
 
-> 1. Clone the go-vrf repository:
->
-> ```console
-> $ git clone https://github.com/chmenegatti/go-vrf.git
-> ```
->
-> 2. Change to the project directory:
-> ```console
-> $ cd go-vrf
-> ```
->
-> 3. Install the dependencies:
-> ```console
-> $ go build -o myapp
-> ```
+Replique o bloco para cada ambiente que precisar. O prefixo é informado em cada
+requisição pelo campo `Edge` (ex.: `"Edge": "TESP5"`).
 
-###  Usage
+### TLS
 
-<h4>From <code>source</code></h4>
+| Variável               | Padrão  | Descrição                                                                 |
+| ---------------------- | ------- | ------------------------------------------------------------------------- |
+| `NSXT_SKIP_TLS_VERIFY` | `false` | Se `true`, ignora a verificação de certificado (**inseguro**, só dev).    |
+| `NSXT_CA_BUNDLE`       | (vazio) | Caminho para um PEM com a CA do NSX-T, anexado às raízes do sistema.      |
 
-> Run go-vrf using the command below:
-> ```console
-> $ ./myapp
-> ```
+Para NSX-T com certificado autoassinado, o recomendado é instalar a CA e apontar
+`NSXT_CA_BUNDLE`; `NSXT_SKIP_TLS_VERIFY=true` deve ser apenas um paliativo.
 
-###  Tests
-
-> Run the unit test suite (live NSX-T integration tests are excluded):
-> ```console
-> $ make test
-> ```
-> Integration tests hit a real NSX-T appliance and need credentials:
-> ```console
-> $ make test-integration
-> ```
+> ⚠️ O arquivo `.env` é ignorado pelo Git e **nunca** deve ser commitado.
 
 ---
 
-##  Conventions
+## Executando
 
-- **Code and code comments are written in English.** User-facing docs may
-  be in Portuguese.
-- **Before opening a PR**, run the full check suite and make sure it is green:
+O `Makefile` cobre as tarefas comuns:
+
+```console
+$ make run               # sobe o servidor (porta :4000)
+$ make build             # compila o binário ./go-vrf
+$ make test              # testes unitários (exclui integração)
+$ make test-integration  # testes contra um NSX-T real (requer credenciais)
+$ make lint              # golangci-lint
+$ make fmt               # formata o código
+$ make check             # suíte completa: fmt + vet + lint + test
+$ make help              # lista todos os alvos
+```
+
+O servidor escuta em `:4000` e encerra de forma graciosa ao receber
+`SIGINT`/`SIGTERM`.
+
+---
+
+## Endpoints da API
+
+Todos os endpoints são `POST` e recebem/retornam JSON. Base URL: `http://localhost:4000`.
+
+### 1. `POST /generate-etcd-key`
+
+Resolve o edge cluster e a transport zone pelo nome, monta o registro de
+`EdgeCluster` e o persiste em `<VrfName>.json`.
+
+**Payload** (`objects.EdgeClusterEtcd`):
+
+```json
+{
+  "Edge": "TESP5",
+  "VrfName": "T0-Cluster_4",
+  "NsxtEdgeClusterName": "edge-cluster-01",
+  "TransportZoneName": "tz-overlay",
+  "VirtualFirewall": "fw-virtual-01",
+  "FirewallExternalAddress": "10.0.0.1",
+  "MaxOrganization": 100,
+  "Enable": true,
+  "RubrikDatabaseCluster": "rubrik-01"
+}
+```
+
+```console
+$ curl -X POST http://localhost:4000/generate-etcd-key \
+    -H 'Content-Type: application/json' \
+    -d @payload-etcd.json
+```
+
+**Resposta** (`200`): objeto chaveado pelo `VrfName` com o registro gerado, mais o
+nome do arquivo salvo:
+
+```json
+{
+  "T0-Cluster_4": { "nsxt_tier0_id": "T0-Cluster_4", "index": 11, "...": "..." },
+  "filename": "T0-Cluster_4.json"
+}
+```
+
+### 2. `POST /create-organization-vrf`
+
+Lê `<VrfName>.json`, resolve o Tier-1 gateway e a security policy pelo nome
+(`NameTier1`), monta a organização e a persiste em `<NameTier1>.json`.
+
+**Payload** (`objects.OrganizationVRF`):
+
+```json
+{
+  "Edge": "TESP5",
+  "VrfName": "T0-Cluster_4",
+  "NameTier1": "DB-Shared_10"
+}
+```
+
+```console
+$ curl -X POST http://localhost:4000/create-organization-vrf \
+    -H 'Content-Type: application/json' \
+    -d @payload-org.json
+```
+
+**Resposta** (`200`): o registro da organização e o `INSERT` SQL correspondente:
+
+```json
+{
+  "data": { "id": "…", "name": "DB-Shared_10", "status": "COMPLETED", "...": "..." },
+  "sql": "INSERT INTO organizations (...) VALUES (...);"
+}
+```
+
+### 3. `POST /create-networks-vrf`
+
+Lê `<NameTier1>.json`, resolve segments, groups, profiles e logical switches para
+cada produto informado, monta as redes e persiste em `<NameTier1>_Networks.json`.
+
+**Payload** (`objects.NetworksProductsVRF`):
+
+```json
+{
+  "Edge": "TESP5",
+  "NameTier1": "DB-Shared_10",
+  "Products": ["produto-a", "produto-b"]
+}
+```
+
+```console
+$ curl -X POST http://localhost:4000/create-networks-vrf \
+    -H 'Content-Type: application/json' \
+    -d @payload-net.json
+```
+
+**Resposta** (`200`): a lista de redes e os `INSERT` SQL (um por rede):
+
+```json
+{
+  "data": [ { "id": "…", "name": "produto-a", "status": "COMPLETED", "...": "..." } ],
+  "sql": [ "INSERT INTO networks (...) VALUES (...);" ]
+}
+```
+
+> Em caso de erro de validação ou de comunicação com o NSX-T, a resposta usa
+> status `4xx`/`5xx` com um objeto `{ "message": "..." }`.
+
+---
+
+## Fluxo de uso
+
+Os endpoints são encadeados — cada um consome o JSON gerado pelo anterior:
+
+```
+generate-etcd-key      →  escreve  <VrfName>.json
+        │
+create-organization-vrf →  lê <VrfName>.json   →  escreve <NameTier1>.json
+        │
+create-networks-vrf     →  lê <NameTier1>.json →  escreve <NameTier1>_Networks.json
+```
+
+Os arquivos JSON gerados são artefatos de runtime (ignorados pelo Git).
+
+---
+
+## Testes
+
+```console
+$ make test               # unitários — sem chamadas externas
+$ make test-integration   # integração — exige NSX-T real + credenciais no .env
+```
+
+Os testes de integração (`src/nsxt/nsxt_api_test.go`) ficam atrás da build tag
+`integration` e batem em um appliance NSX-T real (`TESP5`), por isso são
+excluídos da execução padrão.
+
+---
+
+## Convenções
+
+- **Código e comentários em inglês.** Documentação voltada ao usuário (como este
+  README) pode ser em português.
+- **Antes de abrir um PR**, rode a suíte completa e garanta que está verde:
   ```console
   $ make check   # fmt + vet + lint + test
   ```
+- A CI roda `build`, `test` e `lint` (golangci-lint) em cada push e PR.
 
 ---
 
-##  Project Roadmap
+## Contribuindo
 
-- [X] `► INSERT-TASK-1`
-- [ ] `► INSERT-TASK-2`
-- [ ] `► ...`
-
----
-
-##  Contributing
-
-Contributions are welcome! Here are several ways you can contribute:
-
-- **[Report Issues](https://github.com/chmenegatti/go-vrf.git/issues)**: Submit bugs found or log feature requests for the `go-vrf` project.
-- **[Submit Pull Requests](https://github.com/chmenegatti/go-vrf.git/blob/main/CONTRIBUTING.md)**: Review open PRs, and submit your own PRs.
-- **[Join the Discussions](https://github.com/chmenegatti/go-vrf.git/discussions)**: Share your insights, provide feedback, or ask questions.
-
-<details closed>
-<summary>Contributing Guidelines</summary>
-
-1. **Fork the Repository**: Start by forking the project repository to your github account.
-2. **Clone Locally**: Clone the forked repository to your local machine using a git client.
+1. **Fork** do repositório.
+2. **Clone** local:
    ```sh
    git clone https://github.com/chmenegatti/go-vrf.git
    ```
-3. **Create a New Branch**: Always work on a new branch, giving it a descriptive name.
+3. **Branch** descritiva:
    ```sh
-   git checkout -b new-feature-x
+   git checkout -b fix/minha-correcao
    ```
-4. **Make Your Changes**: Develop and test your changes locally. Run `make check` before committing.
-5. **Commit Your Changes**: Commit with a clear message describing your updates.
-   ```sh
-   git commit -m 'Implemented new feature x.'
-   ```
-6. **Push to github**: Push the changes to your forked repository.
-   ```sh
-   git push origin new-feature-x
-   ```
-7. **Submit a Pull Request**: Create a PR against the original project repository. Clearly describe the changes and their motivations.
-8. **Review**: Once your PR is reviewed and approved, it will be merged into the main branch. Congratulations on your contribution!
-</details>
+4. **Implemente e teste** — rode `make check` antes de commitar.
+5. **Commit** com mensagem clara do "porquê" da mudança.
+6. **Push** e abra um **Pull Request** contra `main`, descrevendo a motivação.
 
-<details closed>
-<summary>Contributor Graph</summary>
-<br>
-<p align="center">
-   <a href="https://github.com{/chmenegatti/go-vrf.git/}graphs/contributors">
-      <img src="https://contrib.rocks/image?repo=chmenegatti/go-vrf.git">
-   </a>
-</p>
-</details>
+Bugs e sugestões: [issues do projeto](https://github.com/chmenegatti/go-vrf/issues).
 
 ---
 
-##  License
+## Licença
 
-This project is protected under the [SELECT-A-LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
+Defina uma licença para o projeto adicionando um arquivo `LICENSE` na raiz.
+Veja [choosealicense.com](https://choosealicense.com/) para ajudar na escolha.
 
----
-
-##  Acknowledgments
-
-- List any resources, contributors, inspiration, etc. here.
-
-[**Return**](#-overview)
-
----
+[**Voltar ao topo**](#go-vrf)
