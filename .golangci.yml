@@ -29,10 +29,17 @@ linters:
 
   settings:
     gosec:
-      # G402 (TLS InsecureSkipVerify): allowed because we guard it behind
-      # NSXT_SKIP_TLS_VERIFY env var with a runtime warning (see #3).
       excludes:
+        # G402 (TLS InsecureSkipVerify): guarded behind NSXT_SKIP_TLS_VERIFY
+        # env var with a runtime warning (see #3).
         - G402
+        # G304 (file inclusion via variable): file names are sanitised by
+        # utils.ValidateFileName before any os.Open/Create; the CA bundle
+        # path comes from operator-controlled env (NSXT_CA_BUNDLE).
+        - G304
+        # G704 (SSRF): request URLs are built from the operator-controlled
+        # NSXT_*_BASEPATH env plus fixed API paths, not from user input.
+        - G704
 
 formatters:
   enable:
