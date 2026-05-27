@@ -33,7 +33,7 @@ func GenerateEtcdKey(c *fiber.Ctx) error {
 		)
 	}
 
-	if edgeResult, err = service.GenerateEtcdKey(payload); err != nil {
+	if edgeResult, err = service.GenerateEtcdKey(c.UserContext(), payload); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
 				"message": "Error generating etcd key",
@@ -92,7 +92,7 @@ func CreateOrganizationVRF(c *fiber.Ctx) error {
 		)
 	}
 
-	if org, err = service.CreateOrganizationVRF(payload.NameTier1, payload.Edge); err != nil {
+	if org, err = service.CreateOrganizationVRF(c.UserContext(), payload.NameTier1, payload.Edge); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
 				"message": "Error creating organization VRF",
@@ -169,7 +169,7 @@ func CreateNetworksProducts(c *fiber.Ctx) error {
 		)
 	}
 
-	if net, err = service.CreateNetworksVRF(payload); err != nil {
+	if net, err = service.CreateNetworksVRF(c.UserContext(), payload); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
 				"message": "Error creating networks VRF",

@@ -1,12 +1,14 @@
 package service
 
 import (
+	"context"
+
 	"go-vrf/src/model"
 	"go-vrf/src/nsxt"
 	"go-vrf/src/objects"
 )
 
-func GenerateEtcdKey(etcd objects.EdgeClusterEtcd) (data model.EdgeCluster, err error) {
+func GenerateEtcdKey(ctx context.Context, etcd objects.EdgeClusterEtcd) (data model.EdgeCluster, err error) {
 
 	var (
 		ec nsxt.EdgeCluster
@@ -17,7 +19,7 @@ func GenerateEtcdKey(etcd objects.EdgeClusterEtcd) (data model.EdgeCluster, err 
 		return data, ErrEdgeClusterNameRequired
 	}
 
-	if ec, err = nsxt.GetEdgeCluster(etcd.Edge); err != nil {
+	if ec, err = nsxt.GetEdgeCluster(ctx, etcd.Edge); err != nil {
 		return
 	}
 
@@ -28,7 +30,7 @@ func GenerateEtcdKey(etcd objects.EdgeClusterEtcd) (data model.EdgeCluster, err 
 		}
 	}
 
-	if tz, err = nsxt.GetTransportZones(etcd.Edge); err != nil {
+	if tz, err = nsxt.GetTransportZones(ctx, etcd.Edge); err != nil {
 		return
 	}
 

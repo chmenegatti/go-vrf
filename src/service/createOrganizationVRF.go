@@ -1,11 +1,13 @@
 package service
 
 import (
+	"context"
+
 	"go-vrf/src/model"
 	"go-vrf/src/nsxt"
 )
 
-func CreateOrganizationVRF(name, edge string) (org model.Organizations, err error) {
+func CreateOrganizationVRF(ctx context.Context, name, edge string) (org model.Organizations, err error) {
 	var (
 		tp  nsxt.Tier1Gateway
 		dfp nsxt.DistributedFirewallPolicy
@@ -19,7 +21,7 @@ func CreateOrganizationVRF(name, edge string) (org model.Organizations, err erro
 		return org, ErrEdgeRequired
 	}
 
-	if tp, err = nsxt.GetTier1Gateways(edge); err != nil {
+	if tp, err = nsxt.GetTier1Gateways(ctx, edge); err != nil {
 		return
 	}
 
@@ -30,7 +32,7 @@ func CreateOrganizationVRF(name, edge string) (org model.Organizations, err erro
 		}
 	}
 
-	if dfp, err = nsxt.GetDistributedFirewallPolicy(edge); err != nil {
+	if dfp, err = nsxt.GetDistributedFirewallPolicy(ctx, edge); err != nil {
 		return
 	}
 
