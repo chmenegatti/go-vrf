@@ -53,6 +53,9 @@ jobs:
           cache: true
 
       - name: golangci-lint
+        # Pin to match the version developers run locally so a green local
+        # lint reliably predicts CI (some gosec rule IDs, e.g. G704, only
+        # exist in newer schemas).
         uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.4
+          version: v2.10.1
