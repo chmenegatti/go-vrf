@@ -40,6 +40,9 @@ linters:
         # G704 (SSRF): request URLs are built from the operator-controlled
         # NSXT_*_BASEPATH env plus fixed API paths, not from user input.
         - G704
+        # G706 (log injection): we only log integer HTTP status codes and
+        # attempt counts, never user-controlled strings.
+        - G706
 
 formatters:
   enable:

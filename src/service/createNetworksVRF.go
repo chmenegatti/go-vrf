@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -9,7 +10,7 @@ import (
 	"go-vrf/src/objects"
 )
 
-func CreateNetworksVRF(obj objects.NetworksProductsVRF) (net []model.Networks, err error) {
+func CreateNetworksVRF(ctx context.Context, obj objects.NetworksProductsVRF) (net []model.Networks, err error) {
 	var (
 		sg   nsxt.Segments
 		gp   nsxt.Groups
@@ -26,15 +27,15 @@ func CreateNetworksVRF(obj objects.NetworksProductsVRF) (net []model.Networks, e
 		return net, ErrTier1NameRequired
 	}
 
-	if sg, err = nsxt.GetSegments(edge); err != nil {
+	if sg, err = nsxt.GetSegments(ctx, edge); err != nil {
 		return
 	}
 
-	if gp, err = nsxt.GetGroups(edge); err != nil {
+	if gp, err = nsxt.GetGroups(ctx, edge); err != nil {
 		return
 	}
 
-	if sw, err = nsxt.GetLogicalSwitches(edge); err != nil {
+	if sw, err = nsxt.GetLogicalSwitches(ctx, edge); err != nil {
 		return
 	}
 
@@ -69,7 +70,7 @@ func CreateNetworksVRF(obj objects.NetworksProductsVRF) (net []model.Networks, e
 			segmentId = fmt.Sprintf("DB-Shared_%s", key)
 		}
 
-		if pf, err = nsxt.GetProfiles(segmentId, edge); err != nil {
+		if pf, err = nsxt.GetProfiles(ctx, segmentId, edge); err != nil {
 			return
 		}
 

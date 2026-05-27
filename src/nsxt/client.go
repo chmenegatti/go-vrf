@@ -1,9 +1,11 @@
 package nsxt
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +14,11 @@ import (
 	"time"
 
 	"go-vrf/src/configs"
+)
+
+const (
+	maxRetries     = 5
+	backoffInitial = 500 * time.Millisecond
 )
 
 var (
@@ -57,7 +64,7 @@ func getClient() (*http.Client, error) {
 	return httpClient, clientErr
 }
 
-func RequestNSXTApi(url, edge string) (r *http.Response, err error) {
+func RequestNSXTApi(ctx context.Context, url, edge string) (*http.Response, error) {
 	var (
 		user = configs.GetEnvKeys(fmt.Sprintf("%s_USERNAME", edge))
 		pass = configs.GetEnvKeys(fmt.Sprintf("%s_PASSWORD", edge))
@@ -68,10 +75,10 @@ func RequestNSXTApi(url, edge string) (r *http.Response, err error) {
 		return nil, err
 	}
 
-	maxRetries := 5
+	var lastErr error
 
 	for attempt := 1; attempt <= maxRetries; attempt++ {
-		req, err := http.NewRequest(http.MethodGet, url, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -81,15 +88,46 @@ func RequestNSXTApi(url, edge string) (r *http.Response, err error) {
 		req.Header.Add("Content-Type", "application/json")
 
 		res, err := d.Do(req)
-
-		if err == nil {
+		if err != nil {
+			// Don't retry if the caller cancelled / timed out.
+			if ctx.Err() != nil {
+				return nil, ctx.Err()
+			}
+			lastErr = err
+			log.Printf("request failed on attempt %d: %v", attempt, err)
+		} else if res.StatusCode >= 500 {
+			// Server-side error: drain and close before retrying so the
+			// connection can be reused.
+			lastErr = fmt.Errorf("server returned status %d", res.StatusCode)
+			_, _ = io.Copy(io.Discard, res.Body)
+			_ = res.Body.Close()
+			log.Printf("request failed on attempt %d: status %d", attempt, res.StatusCode)
+		} else {
+			// 2xx, 3xx, or 4xx: hand back to the caller (fetch checks status).
 			return res, nil
 		}
 
-		log.Printf("Request failed on attempt %d: %v\n", attempt, err)
-
-		time.Sleep(time.Second * 2)
+		if attempt < maxRetries {
+			if err := sleepBackoff(ctx, attempt); err != nil {
+				return nil, err
+			}
+		}
 	}
 
-	return nil, fmt.Errorf("failed to connect to NSX-T after %d attempts", maxRetries)
+	return nil, fmt.Errorf("failed to connect to NSX-T after %d attempts: %w", maxRetries, lastErr)
+}
+
+// sleepBackoff waits backoffInitial * 2^(attempt-1), returning early with
+// the context error if the context is cancelled while waiting.
+func sleepBackoff(ctx context.Context, attempt int) error {
+	delay := backoffInitial * (1 << (attempt - 1))
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
 }
