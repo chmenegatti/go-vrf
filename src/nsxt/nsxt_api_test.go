@@ -51,13 +51,13 @@ func TestApiServiceNSXT_GetTransportZones(t *testing.T) {
 	fmt.Println(r)
 }
 
-func TestApiServiceNSXT_GetLogicalSwitchs(t *testing.T) {
+func TestApiServiceNSXT_GetLogicalSwitches(t *testing.T) {
 	var (
 		err error
 		r   LogicalSwitches
 	)
 
-	if r, err = GetLogicalSwitchs("TESP5"); err != nil {
+	if r, err = GetLogicalSwitches("TESP5"); err != nil {
 		t.Fatalf("error: %s", err)
 	}
 

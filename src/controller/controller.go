@@ -151,7 +151,7 @@ func CreateOrganizationVRF(c *fiber.Ctx) error {
 
 func CreateNetworksProducts(c *fiber.Ctx) error {
 	var (
-		payload objects.NetworksProdutcsVRF
+		payload objects.NetworksProductsVRF
 		net     []model.Networks
 		err     error
 	)

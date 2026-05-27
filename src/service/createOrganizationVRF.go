@@ -10,7 +10,7 @@ import (
 func CreateOrganizationVRF(name, edge string) (org model.Organizations, err error) {
 	var (
 		tp  nsxt.Tier1Gateway
-		dfp nsxt.DistributedFirewalPolicy
+		dfp nsxt.DistributedFirewallPolicy
 	)
 
 	if name == "" {

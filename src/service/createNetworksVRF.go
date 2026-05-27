@@ -9,7 +9,7 @@ import (
 	"go-vrf/src/objects"
 )
 
-func CreateNetworksVRF(obj objects.NetworksProdutcsVRF) (net []model.Networks, err error) {
+func CreateNetworksVRF(obj objects.NetworksProductsVRF) (net []model.Networks, err error) {
 	var (
 		sg   nsxt.Segments
 		gp   nsxt.Groups
@@ -34,7 +34,7 @@ func CreateNetworksVRF(obj objects.NetworksProdutcsVRF) (net []model.Networks, e
 		return
 	}
 
-	if sw, err = nsxt.GetLogicalSwitchs(edge); err != nil {
+	if sw, err = nsxt.GetLogicalSwitches(edge); err != nil {
 		return
 	}
 
