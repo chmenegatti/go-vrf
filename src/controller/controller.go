@@ -63,11 +63,10 @@ func GenerateEtcdKey(c *fiber.Ctx) error {
 		)
 	}
 
-	vrf := fmt.Sprintf("%s", payload.VrfName)
 	return c.Status(fiber.StatusOK).JSON(
 		fiber.Map{
-			vrf:        result,
-			"filename": fmt.Sprintf("%s.json", payload.VrfName),
+			payload.VrfName: result,
+			"filename":      fmt.Sprintf("%s.json", payload.VrfName),
 		},
 	)
 }

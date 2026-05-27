@@ -12,7 +12,7 @@ import (
 // can be exploited to truncate the literal.
 //
 // The result includes the surrounding single quotes, e.g. EscapeLiteral("a'b")
-// returns "'a''b'". Callers should NOT add their own quotes.
+// returns "'a”b'". Callers should NOT add their own quotes.
 func EscapeLiteral(s string) (string, error) {
 	if strings.ContainsRune(s, 0) {
 		return "", fmt.Errorf("string contains NUL byte")
