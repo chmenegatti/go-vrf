@@ -19,11 +19,11 @@ func CreateNetworksVRF(obj objects.NetworksProductsVRF) (net []model.Networks, e
 	)
 
 	if obj.Edge == "" {
-		return net, fmt.Errorf("edge is required")
+		return net, ErrEdgeRequired
 	}
 
 	if obj.NameTier1 == "" {
-		return net, fmt.Errorf("db-shared name on tier 1 is required")
+		return net, ErrTier1NameRequired
 	}
 
 	if sg, err = nsxt.GetSegments(edge); err != nil {

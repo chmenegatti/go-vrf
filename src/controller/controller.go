@@ -12,6 +12,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// edgeClusterIndex is the fixed index assigned to every generated edge
+// cluster record. It is a legacy constant carried over from the original
+// implementation; its downstream meaning is not documented here.
+const edgeClusterIndex = 11
+
 func GenerateEtcdKey(c *fiber.Ctx) error {
 
 	var (
@@ -39,7 +44,7 @@ func GenerateEtcdKey(c *fiber.Ctx) error {
 	uuids := utilities.GenerateUUIDs(2)
 
 	var result = model.EdgeCluster{
-		Index:                   11,
+		Index:                   edgeClusterIndex,
 		NsxtTier0ID:             payload.VrfName,
 		NsxtTier0DisplayName:    payload.VrfName,
 		NsxtEdgeClusterID:       edgeResult.NsxtEdgeClusterID,
@@ -58,7 +63,7 @@ func GenerateEtcdKey(c *fiber.Ctx) error {
 	if err := utilities.SaveToFile(payload.VrfName, result); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
-				"message": fmt.Errorf("error on save to file: %v", err),
+				"message": fmt.Sprintf("error on save to file: %v", err),
 			},
 		)
 	}
@@ -129,7 +134,7 @@ func CreateOrganizationVRF(c *fiber.Ctx) error {
 	if err := utilities.SaveToFile(payload.NameTier1, result); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
-				"message": fmt.Errorf("error on save to file: %v", err),
+				"message": fmt.Sprintf("error on save to file: %v", err),
 			},
 		)
 	}
@@ -194,7 +199,7 @@ func CreateNetworksProducts(c *fiber.Ctx) error {
 	if err := utilities.SaveToFile(jsonFile, net); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			fiber.Map{
-				"message": fmt.Errorf("error on save to file: %v", err),
+				"message": fmt.Sprintf("error on save to file: %v", err),
 			},
 		)
 	}

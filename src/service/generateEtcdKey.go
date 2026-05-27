@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"go-vrf/src/model"
 	"go-vrf/src/nsxt"
 	"go-vrf/src/objects"
@@ -16,7 +14,7 @@ func GenerateEtcdKey(etcd objects.EdgeClusterEtcd) (data model.EdgeCluster, err 
 	)
 
 	if etcd.NsxtEdgeClusterName == "" {
-		return data, fmt.Errorf("nsxt cluster name is empty")
+		return data, ErrEdgeClusterNameRequired
 	}
 
 	if ec, err = nsxt.GetEdgeCluster(etcd.Edge); err != nil {

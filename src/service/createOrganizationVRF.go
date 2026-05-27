@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"go-vrf/src/model"
 	"go-vrf/src/nsxt"
 )
@@ -14,11 +12,11 @@ func CreateOrganizationVRF(name, edge string) (org model.Organizations, err erro
 	)
 
 	if name == "" {
-		return org, fmt.Errorf("name is required")
+		return org, ErrNameRequired
 	}
 
 	if edge == "" {
-		return org, fmt.Errorf("edge is required")
+		return org, ErrEdgeRequired
 	}
 
 	if tp, err = nsxt.GetTier1Gateways(edge); err != nil {
